@@ -1,105 +1,105 @@
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+  display: 'swap',
+})
 
-const SITE_URL = "https://felipetodev.com";
+const SITE_URL = 'https://felipetodev.com'
 
 export const viewport: Viewport = {
-  themeColor: "#0a0b10",
-  width: "device-width",
+  themeColor: '#0a0b10',
+  width: 'device-width',
   initialScale: 1,
-};
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Felipe Ossandon - Full-Stack Engineer",
+  title: 'Felipe Ossandon - Full-Stack Engineer',
   description:
-    "Full-stack engineer focused on building fast frontends, efficient backends, and developer-first products that scale reliably. Based in Chile.",
+    'Full-stack engineer focused on building fast frontends, efficient backends, and developer-first products that scale reliably. Based in Chile.',
   keywords: [
-    "full-stack engineer",
-    "software developer",
-    "React",
-    "Next.js",
-    "TypeScript",
-    "Chile",
-    "frontend",
-    "backend",
+    'full-stack engineer',
+    'software developer',
+    'React',
+    'Next.js',
+    'TypeScript',
+    'Chile',
+    'frontend',
+    'backend',
   ],
-  authors: [{ name: "Felipe Ossandon", url: SITE_URL }],
-  creator: "Felipe Ossandon",
+  authors: [{ name: 'Felipe Ossandon', url: SITE_URL }],
+  creator: 'Felipe Ossandon',
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
   alternates: {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: "Felipe Ossandon - Full-Stack Engineer",
+    title: 'Felipe Ossandon - Full-Stack Engineer',
     description:
-      "Full-stack engineer focused on building fast frontends, efficient backends, and developer-first products.",
+      'Full-stack engineer focused on building fast frontends, efficient backends, and developer-first products.',
     url: SITE_URL,
-    siteName: "Felipe Ossandon",
-    locale: "en_US",
-    type: "website",
+    siteName: 'Felipe Ossandon',
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    creator: "@fe_ossandon",
-    title: "Felipe Ossandon - Full-Stack Engineer",
+    card: 'summary_large_image',
+    creator: '@fe_ossandon',
+    title: 'Felipe Ossandon - Full-Stack Engineer',
     description:
-      "Full-stack engineer focused on building fast frontends, efficient backends, and developer-first products.",
+      'Full-stack engineer focused on building fast frontends, efficient backends, and developer-first products.',
   },
-};
+}
 
 const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Felipe Ossandon",
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Felipe Ossandon',
   url: SITE_URL,
-  jobTitle: "Full-Stack Engineer",
+  jobTitle: 'Full-Stack Engineer',
   worksFor: {
-    "@type": "Organization",
-    name: "Globant",
+    '@type': 'Organization',
+    name: 'Globant',
   },
   sameAs: [
-    "https://github.com/felipetodev",
-    "https://x.com/fe_ossandon",
-    "https://linkedin.com/in/felipeossandon",
+    'https://github.com/felipetodev',
+    'https://x.com/fe_ossandon',
+    'https://linkedin.com/in/felipeossandon',
   ],
-};
+}
 
-export default function RootLayout({
+export default function RootLayout ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang='en' className='dark'>
       <head>
-        <link rel="dns-prefetch" href="https://api.github.com" />
-        <link rel="preconnect" href="https://api.github.com" crossOrigin="anonymous" />
+        <link rel='dns-prefetch' href='https://api.github.com' />
+        <link rel='preconnect' href='https://api.github.com' crossOrigin='anonymous' />
         <script
-          type="application/ld+json"
+          type='application/ld+json'
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
@@ -109,5 +109,5 @@ export default function RootLayout({
         {children}
       </body>
     </html>
-  );
+  )
 }
