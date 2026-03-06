@@ -1,53 +1,69 @@
 'use client'
 
-import { useRef, useMemo, useEffect } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useMemo, useEffect, useState } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-const STAR_COUNT = 3000
-const NEBULA_PARTICLES = 800
+const GRID_SIZE = 20
+const CELL_SIZE = 2
+const HOVER_RADIUS = 3
 
-function Stars() {
-  const pointsRef = useRef<THREE.Points>(null)
-  const mouse = useRef({ x: 0, y: 0 })
+interface GridCell {
+  x: number
+  y: number
+  elevation: number
+  targetElevation: number
+}
 
-  const [positions, colors, sizes] = useMemo(() => {
-    const positions = new Float32Array(STAR_COUNT * 3)
-    const colors = new Float32Array(STAR_COUNT * 3)
-    const sizes = new Float32Array(STAR_COUNT)
+function InteractiveGrid() {
+  const groupRef = useRef<THREE.Group>(null)
+  const cellsRef = useRef<GridCell[][]>([])
+  const trianglesRef = useRef<THREE.Group>(null)
+  const mouse = useRef(new THREE.Vector2(9999, 9999))
+  const raycaster = useRef(new THREE.Raycaster())
+  const planeRef = useRef<THREE.Mesh>(null)
+  const { camera } = useThree()
 
-    for (let i = 0; i < STAR_COUNT; i++) {
-      const i3 = i * 3
-      
-      const radius = Math.random() * 50 + 5
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.acos(2 * Math.random() - 1)
-      
-      positions[i3] = radius * Math.sin(phi) * Math.cos(theta)
-      positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta)
-      positions[i3 + 2] = (Math.random() - 0.5) * 30
-      
-      const colorChoice = Math.random()
-      if (colorChoice < 0.5) {
-        colors[i3] = 0.9 + Math.random() * 0.1
-        colors[i3 + 1] = 0.9 + Math.random() * 0.1
-        colors[i3 + 2] = 1.0
-      } else if (colorChoice < 0.8) {
-        colors[i3] = 0.24
-        colors[i3 + 1] = 0.61
-        colors[i3 + 2] = 0.72
-      } else {
-        colors[i3] = 1.0
-        colors[i3 + 1] = 0.95
-        colors[i3 + 2] = 0.8
+  // Initialize grid cells
+  useMemo(() => {
+    const cells: GridCell[][] = []
+    for (let i = 0; i < GRID_SIZE; i++) {
+      cells[i] = []
+      for (let j = 0; j < GRID_SIZE; j++) {
+        cells[i][j] = {
+          x: (i - GRID_SIZE / 2) * CELL_SIZE,
+          y: (j - GRID_SIZE / 2) * CELL_SIZE,
+          elevation: 0,
+          targetElevation: 0,
+        }
       }
-      
-      sizes[i] = Math.random() * 2 + 0.5
     }
-
-    return [positions, colors, sizes]
+    cellsRef.current = cells
   }, [])
 
+  // Create grid lines geometry
+  const gridGeometry = useMemo(() => {
+    const positions: number[] = []
+    const halfSize = (GRID_SIZE * CELL_SIZE) / 2
+
+    // Horizontal lines
+    for (let i = 0; i <= GRID_SIZE; i++) {
+      const y = i * CELL_SIZE - halfSize
+      positions.push(-halfSize, y, 0, halfSize, y, 0)
+    }
+
+    // Vertical lines
+    for (let i = 0; i <= GRID_SIZE; i++) {
+      const x = i * CELL_SIZE - halfSize
+      positions.push(x, -halfSize, 0, x, halfSize, 0)
+    }
+
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    return geometry
+  }, [])
+
+  // Track mouse movement
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
@@ -57,210 +73,174 @@ function Stars() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  useFrame((state) => {
-    if (!pointsRef.current) return
-    
-    pointsRef.current.rotation.z += 0.0002
-    
-    pointsRef.current.rotation.x = THREE.MathUtils.lerp(
-      pointsRef.current.rotation.x,
-      mouse.current.y * 0.15,
-      0.02
-    )
-    pointsRef.current.rotation.y = THREE.MathUtils.lerp(
-      pointsRef.current.rotation.y,
-      mouse.current.x * 0.15,
-      0.02
-    )
+  useFrame(() => {
+    if (!groupRef.current || !planeRef.current || !trianglesRef.current) return
 
-    const material = pointsRef.current.material as THREE.ShaderMaterial
-    material.uniforms.uTime.value = state.clock.elapsedTime
-  })
+    // Raycast to find hover position
+    raycaster.current.setFromCamera(mouse.current, camera)
+    const intersects = raycaster.current.intersectObject(planeRef.current)
 
-  const shaderMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0 },
-      },
-      vertexShader: `
-        attribute float size;
-        attribute vec3 customColor;
-        varying vec3 vColor;
-        uniform float uTime;
-        
-        void main() {
-          vColor = customColor;
-          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          float twinkle = sin(uTime * 2.0 + position.x * 10.0) * 0.3 + 0.7;
-          gl_PointSize = size * twinkle * (300.0 / -mvPosition.z);
-          gl_Position = projectionMatrix * mvPosition;
+    let hoverX = 9999
+    let hoverY = 9999
+
+    if (intersects.length > 0) {
+      const point = intersects[0].point
+      hoverX = point.x
+      hoverY = point.y
+    }
+
+    // Update cell elevations based on hover
+    const cells = cellsRef.current
+    for (let i = 0; i < GRID_SIZE; i++) {
+      for (let j = 0; j < GRID_SIZE; j++) {
+        const cell = cells[i][j]
+        const dx = cell.x + CELL_SIZE / 2 - hoverX
+        const dy = cell.y + CELL_SIZE / 2 - hoverY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        if (dist < HOVER_RADIUS * CELL_SIZE) {
+          const intensity = 1 - dist / (HOVER_RADIUS * CELL_SIZE)
+          cell.targetElevation = intensity * 1.5
+        } else {
+          cell.targetElevation = 0
         }
-      `,
-      fragmentShader: `
-        varying vec3 vColor;
-        
-        void main() {
-          float dist = length(gl_PointCoord - vec2(0.5));
-          if (dist > 0.5) discard;
-          float alpha = 1.0 - smoothstep(0.0, 0.5, dist);
-          alpha = pow(alpha, 1.5);
-          gl_FragColor = vec4(vColor, alpha);
-        }
-      `,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    })
-  }, [])
 
-  return (
-    <points ref={pointsRef} material={shaderMaterial}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={STAR_COUNT}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-customColor"
-          count={STAR_COUNT}
-          array={colors}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          count={STAR_COUNT}
-          array={sizes}
-          itemSize={1}
-        />
-      </bufferGeometry>
-    </points>
-  )
-}
-
-function Nebula() {
-  const pointsRef = useRef<THREE.Points>(null)
-
-  const [positions, colors] = useMemo(() => {
-    const positions = new Float32Array(NEBULA_PARTICLES * 3)
-    const colors = new Float32Array(NEBULA_PARTICLES * 3)
-
-    for (let i = 0; i < NEBULA_PARTICLES; i++) {
-      const i3 = i * 3
-      
-      const arm = Math.floor(Math.random() * 2)
-      const armAngle = arm * Math.PI
-      const radius = Math.random() * 25 + 3
-      const angle = armAngle + (radius * 0.15) + (Math.random() - 0.5) * 0.5
-      
-      positions[i3] = Math.cos(angle) * radius + (Math.random() - 0.5) * 8
-      positions[i3 + 1] = Math.sin(angle) * radius + (Math.random() - 0.5) * 8
-      positions[i3 + 2] = (Math.random() - 0.5) * 10
-      
-      const colorMix = Math.random()
-      if (colorMix < 0.4) {
-        colors[i3] = 0.24
-        colors[i3 + 1] = 0.61
-        colors[i3 + 2] = 0.72
-      } else if (colorMix < 0.7) {
-        colors[i3] = 0.1
-        colors[i3 + 1] = 0.2
-        colors[i3 + 2] = 0.6
-      } else {
-        colors[i3] = 0.4
-        colors[i3 + 1] = 0.2
-        colors[i3 + 2] = 0.5
+        // Smooth interpolation
+        cell.elevation += (cell.targetElevation - cell.elevation) * 0.08
       }
     }
 
-    return [positions, colors]
-  }, [])
+    // Update triangles
+    const triangles = trianglesRef.current.children as THREE.Mesh[]
+    let triangleIndex = 0
 
-  useFrame(() => {
-    if (!pointsRef.current) return
-    pointsRef.current.rotation.z += 0.0003
+    for (let i = 0; i < GRID_SIZE; i++) {
+      for (let j = 0; j < GRID_SIZE; j++) {
+        const cell = cells[i][j]
+        const triangle = triangles[triangleIndex]
+
+        if (triangle) {
+          const scale = cell.elevation * 0.8
+          triangle.scale.set(scale, scale, scale)
+          triangle.position.z = cell.elevation * 0.5
+          triangle.rotation.z += 0.02 * cell.elevation
+
+          const material = triangle.material as THREE.MeshBasicMaterial
+          material.opacity = cell.elevation * 0.6
+        }
+
+        triangleIndex++
+      }
+    }
+
+    // Subtle rotation based on mouse
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(
+      groupRef.current.rotation.x,
+      -Math.PI / 2 + mouse.current.y * 0.1,
+      0.02
+    )
+    groupRef.current.rotation.z = THREE.MathUtils.lerp(
+      groupRef.current.rotation.z,
+      mouse.current.x * 0.1,
+      0.02
+    )
   })
 
-  const nebulaShaderMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      vertexShader: `
-        attribute vec3 customColor;
-        varying vec3 vColor;
-        
-        void main() {
-          vColor = customColor;
-          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = 80.0 * (300.0 / -mvPosition.z);
-          gl_Position = projectionMatrix * mvPosition;
-        }
-      `,
-      fragmentShader: `
-        varying vec3 vColor;
-        
-        void main() {
-          float dist = length(gl_PointCoord - vec2(0.5));
-          if (dist > 0.5) discard;
-          float alpha = 1.0 - smoothstep(0.0, 0.5, dist);
-          alpha = pow(alpha, 3.0) * 0.15;
-          gl_FragColor = vec4(vColor, alpha);
-        }
-      `,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    })
+  // Create triangle shapes for each cell
+  const triangles = useMemo(() => {
+    const shapes: JSX.Element[] = []
+    const halfSize = (GRID_SIZE * CELL_SIZE) / 2
+
+    for (let i = 0; i < GRID_SIZE; i++) {
+      for (let j = 0; j < GRID_SIZE; j++) {
+        const x = i * CELL_SIZE - halfSize + CELL_SIZE / 2
+        const y = j * CELL_SIZE - halfSize + CELL_SIZE / 2
+
+        shapes.push(
+          <mesh key={`${i}-${j}`} position={[x, y, 0]}>
+            <coneGeometry args={[CELL_SIZE * 0.4, CELL_SIZE * 0.6, 3]} />
+            <meshBasicMaterial
+              color="#3d9cb7"
+              transparent
+              opacity={0}
+              depthWrite={false}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        )
+      }
+    }
+
+    return shapes
   }, [])
 
   return (
-    <points ref={pointsRef} material={nebulaShaderMaterial}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={NEBULA_PARTICLES}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-customColor"
-          count={NEBULA_PARTICLES}
-          array={colors}
-          itemSize={3}
-        />
-      </bufferGeometry>
-    </points>
+    <group ref={groupRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -5]}>
+      {/* Invisible plane for raycasting */}
+      <mesh ref={planeRef} visible={false}>
+        <planeGeometry args={[GRID_SIZE * CELL_SIZE * 2, GRID_SIZE * CELL_SIZE * 2]} />
+        <meshBasicMaterial />
+      </mesh>
+
+      {/* Grid lines */}
+      <lineSegments geometry={gridGeometry}>
+        <lineBasicMaterial color="#3d9cb7" transparent opacity={0.15} />
+      </lineSegments>
+
+      {/* Triangle shapes */}
+      <group ref={trianglesRef}>{triangles}</group>
+
+      {/* Intersection points */}
+      <Points />
+    </group>
   )
 }
 
-function GalaxyCore() {
-  const meshRef = useRef<THREE.Mesh>(null)
+function Points() {
+  const pointsRef = useRef<THREE.Points>(null)
 
-  useFrame((state) => {
-    if (!meshRef.current) return
-    meshRef.current.rotation.z += 0.001
-    const scale = 1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.1
-    meshRef.current.scale.setScalar(scale)
-  })
+  const positions = useMemo(() => {
+    const pos: number[] = []
+    const halfSize = (GRID_SIZE * CELL_SIZE) / 2
+
+    for (let i = 0; i <= GRID_SIZE; i++) {
+      for (let j = 0; j <= GRID_SIZE; j++) {
+        pos.push(
+          i * CELL_SIZE - halfSize,
+          j * CELL_SIZE - halfSize,
+          0
+        )
+      }
+    }
+
+    return new Float32Array(pos)
+  }, [])
 
   return (
-    <mesh ref={meshRef}>
-      <sphereGeometry args={[3, 32, 32]} />
-      <meshBasicMaterial
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={positions.length / 3}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
         color="#3d9cb7"
+        size={3}
         transparent
-        opacity={0.08}
-        depthWrite={false}
+        opacity={0.3}
+        sizeAttenuation={false}
       />
-    </mesh>
+    </points>
   )
 }
 
 function Scene() {
   return (
     <>
-      <GalaxyCore />
-      <Nebula />
-      <Stars />
+      <InteractiveGrid />
     </>
   )
 }
@@ -268,7 +248,7 @@ function Scene() {
 export default function GalaxyCanvas() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 40], fov: 60 }}
+      camera={{ position: [0, 15, 30], fov: 50 }}
       dpr={[1, 1.5]}
       gl={{
         antialias: true,
