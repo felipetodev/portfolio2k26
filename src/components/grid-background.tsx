@@ -2,13 +2,23 @@
 
 import { useRef, useMemo, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import {
+  Points,
+  Mesh,
+  ShaderMaterial,
+  AdditiveBlending,
+  MathUtils,
+  SphereGeometry,
+  MeshBasicMaterial,
+  BufferGeometry,
+  Float32BufferAttribute,
+} from 'three'
 
 const STAR_COUNT = 3000
 const NEBULA_PARTICLES = 800
 
 function Stars() {
-  const pointsRef = useRef<THREE.Points>(null)
+  const pointsRef = useRef<Points>(null)
   const mouse = useRef({ x: 0, y: 0 })
 
   const [positions, colors, sizes] = useMemo(() => {
@@ -69,24 +79,24 @@ function Stars() {
     pointsRef.current.rotation.z += 0.0002
     
     // Mouse-based rotation
-    pointsRef.current.rotation.x = THREE.MathUtils.lerp(
+    pointsRef.current.rotation.x = MathUtils.lerp(
       pointsRef.current.rotation.x,
       mouse.current.y * 0.15,
       0.02
     )
-    pointsRef.current.rotation.y = THREE.MathUtils.lerp(
+    pointsRef.current.rotation.y = MathUtils.lerp(
       pointsRef.current.rotation.y,
       mouse.current.x * 0.15,
       0.02
     )
 
     // Subtle pulsing effect
-    const material = pointsRef.current.material as THREE.ShaderMaterial
+    const material = pointsRef.current.material as ShaderMaterial
     material.uniforms.uTime.value = state.clock.elapsedTime
   })
 
   const shaderMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
+    return new ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
       },
@@ -123,7 +133,7 @@ function Stars() {
       `,
       transparent: true,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
     })
   }, [])
 
@@ -154,7 +164,7 @@ function Stars() {
 }
 
 function Nebula() {
-  const pointsRef = useRef<THREE.Points>(null)
+  const pointsRef = useRef<Points>(null)
 
   const [positions, colors] = useMemo(() => {
     const positions = new Float32Array(NEBULA_PARTICLES * 3)
@@ -201,8 +211,8 @@ function Nebula() {
     pointsRef.current.rotation.z += 0.0003
   })
 
-  const shaderMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
+  const nebulaShaderMaterial = useMemo(() => {
+    return new ShaderMaterial({
       vertexShader: `
         attribute vec3 customColor;
         varying vec3 vColor;
@@ -230,12 +240,12 @@ function Nebula() {
       `,
       transparent: true,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
     })
   }, [])
 
   return (
-    <points ref={pointsRef} material={shaderMaterial}>
+    <points ref={pointsRef} material={nebulaShaderMaterial}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -255,7 +265,7 @@ function Nebula() {
 }
 
 function GalaxyCore() {
-  const meshRef = useRef<THREE.Mesh>(null)
+  const meshRef = useRef<Mesh>(null)
 
   useFrame((state) => {
     if (!meshRef.current) return
