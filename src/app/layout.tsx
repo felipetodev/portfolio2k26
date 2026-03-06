@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { GridBackground } from '@/components/grid-background'
 import './globals.css'
 
 const geistSans = Geist({
@@ -116,6 +117,7 @@ export default function RootLayout ({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <GridBackground />
         {children}
       </body>
     </html>
