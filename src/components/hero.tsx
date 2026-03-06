@@ -25,8 +25,11 @@ export function Hero () {
         </p>
       </div>
 
-      <p className='max-w-lg font-sans text-sm leading-relaxed text-muted-foreground'>
+      <p className='text-pretty max-w-lg font-sans text-sm leading-relaxed text-muted-foreground'>
         {SITE_CONFIG.bio}
+      </p>
+      <p className='max-w-lg font-sans text-sm leading-relaxed text-muted-foreground'>
+        {SITE_CONFIG.subBio}
       </p>
     </section>
   )

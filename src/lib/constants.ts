@@ -5,7 +5,8 @@ export const SITE_CONFIG = {
   title: 'Full-Stack Engineer',
   location: 'Chile',
   bio: 'Full-stack engineer focused on building things that run fast \u2014 fast frontends, efficient backends, and developer-first products that scale reliably.',
-  extendedBio: 'Currently at Globant, building the main booking platform for British Airways. Previously shipped banking systems, AI-powered dev tools with 700k+ installs, and design systems that moved the needle on conversion.',
+  subBio: 'I\'m interested in Generative AI, design systems, user/dev experience, product and under engineering.',
+  extendedBio: 'Currently at Globant, building the main booking platform for ✈️ 🇬🇧 British Airways. Previously shipped banking systems, AI-powered dev tools with 700k+ installs, and design systems that moved the needle on conversion.',
   socials: {
     github: 'https://github.com/felipetodev',
     twitter: 'https://x.com/fe_ossandon',

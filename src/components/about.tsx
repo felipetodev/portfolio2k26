@@ -7,9 +7,7 @@ export function About () {
         About
       </h2>
       <div className='flex flex-col gap-3 font-sans text-sm leading-relaxed text-muted-foreground'>
-        {SITE_CONFIG.extendedBio.split('\n\n').map((paragraph) => (
-          <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-        ))}
+        <p className='text-pretty'>{SITE_CONFIG.extendedBio}</p>
       </div>
     </section>
   )
