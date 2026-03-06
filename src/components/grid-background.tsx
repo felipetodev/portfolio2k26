@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 
-const GalaxyCanvas = dynamic(() => import('./galaxy-canvas'), {
+const GridCanvas = dynamic(() => import('./grid-canvas'), {
   ssr: false,
   loading: () => null,
 })
@@ -11,9 +11,9 @@ export function GridBackground() {
   return (
     <div
       className="pointer-events-none fixed inset-0 -z-10"
-      style={{ opacity: 0.35 }}
+      style={{ opacity: 0.5 }}
     >
-      <GalaxyCanvas />
+      <GridCanvas />
     </div>
   )
 }
