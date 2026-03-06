@@ -61,6 +61,15 @@ export const metadata: Metadata = {
     siteName: 'Felipe Ossandon',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/og_image.png',
+        width: 1376,
+        height: 768,
+        alt: 'Felipe Ossandon - Full-Stack Engineer',
+        type: 'image/png',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -68,6 +77,7 @@ export const metadata: Metadata = {
     title: 'Felipe Ossandon - Full-Stack Engineer',
     description:
       'Full-stack engineer focused on building fast frontends, efficient backends, and developer-first products.',
+    images: ['/og_image.png'],
   },
 }
 
