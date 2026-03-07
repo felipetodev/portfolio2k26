@@ -1,5 +1,17 @@
 'use client'
 
+// Suppress THREE.Clock deprecation warning BEFORE any Three.js imports
+const _origWarn = typeof console !== 'undefined' ? console.warn : () => {}
+if (typeof console !== 'undefined') {
+  console.warn = function (...args: unknown[]) {
+    if (args[0] && typeof args[0] === 'string' && 
+        (args[0].includes('Clock') || args[0].includes('deprecated'))) {
+      return
+    }
+    _origWarn.apply(console, args)
+  }
+}
+
 import { useRef, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import {
@@ -7,15 +19,6 @@ import {
   Vector2,
   Vector3,
 } from 'three'
-
-// Suppress THREE.Clock deprecation warning from R3F internals
-if (typeof window !== 'undefined') {
-  const originalWarn = console.warn
-  console.warn = (...args: unknown[]) => {
-    if (typeof args[0] === 'string' && args[0].includes('Clock')) return
-    originalWarn.apply(console, args)
-  }
-}
 
 const GRID_SIZE = 80
 const GRID_DIVISIONS = 60
