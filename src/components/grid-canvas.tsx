@@ -12,6 +12,7 @@ function Grid() {
   const groupRef = useRef<Group>(null)
   const linesRef = useRef<LineSegments>(null)
   const mouse = useRef({ x: 0, y: 0 })
+  const timeRef = useRef(0)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -44,17 +45,17 @@ function Grid() {
     return new Float32Array(vertices)
   }, [])
 
-  useFrame((state) => {
+  useFrame((_, delta) => {
     if (!groupRef.current) return
 
-    const time = state.clock.elapsedTime
+    timeRef.current += delta
 
     // Subtle rotation based on mouse position
     groupRef.current.rotation.x = -0.4 + mouse.current.y * 0.1
     groupRef.current.rotation.y = mouse.current.x * 0.15
 
     // Very subtle wave animation
-    groupRef.current.position.z = Math.sin(time * 0.3) * 0.2
+    groupRef.current.position.z = Math.sin(timeRef.current * 0.3) * 0.2
   })
 
   return (
