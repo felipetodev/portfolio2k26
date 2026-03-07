@@ -299,6 +299,15 @@ export default function GridCanvas() {
       camera={{ position: [0, 0, 35], fov: 50 }}
       gl={{ antialias: true, alpha: true }}
       style={{ background: 'transparent' }}
+      frameloop="always"
+      onCreated={({ gl }) => {
+        // Suppress Three.js deprecation warnings in console
+        const originalWarn = console.warn
+        console.warn = (...args) => {
+          if (typeof args[0] === 'string' && args[0].includes('Clock')) return
+          originalWarn.apply(console, args)
+        }
+      }}
     >
       <InteractiveGrid />
     </Canvas>
