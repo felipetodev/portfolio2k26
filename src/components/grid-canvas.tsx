@@ -6,10 +6,16 @@ import {
   ShaderMaterial,
   Vector2,
   Vector3,
-  BufferGeometry,
-  Float32BufferAttribute,
-  Points,
 } from 'three'
+
+// Suppress THREE.Clock deprecation warning from R3F internals
+if (typeof window !== 'undefined') {
+  const originalWarn = console.warn
+  console.warn = (...args: unknown[]) => {
+    if (typeof args[0] === 'string' && args[0].includes('Clock')) return
+    originalWarn.apply(console, args)
+  }
+}
 
 const GRID_SIZE = 80
 const GRID_DIVISIONS = 60
@@ -300,14 +306,6 @@ export default function GridCanvas() {
       gl={{ antialias: true, alpha: true }}
       style={{ background: 'transparent' }}
       frameloop="always"
-      onCreated={({ gl }) => {
-        // Suppress Three.js deprecation warnings in console
-        const originalWarn = console.warn
-        console.warn = (...args) => {
-          if (typeof args[0] === 'string' && args[0].includes('Clock')) return
-          originalWarn.apply(console, args)
-        }
-      }}
     >
       <InteractiveGrid />
     </Canvas>
