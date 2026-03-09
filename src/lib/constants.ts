@@ -23,12 +23,12 @@ export const PINNED_REPOS = [
 export const FEATURED_REPOS = [
   ...PINNED_REPOS,
   'log.js',
+  'mooonto',
   'alternify',
   'gentleman-transcript',
   'colabot',
   'colab-ai',
   'wanderlust',
-  'styledcn-ui',
 ] as const
 
 export const EXCLUDED_REPOS = [
@@ -48,7 +48,7 @@ export const EXCLUDED_REPOS = [
   'Ossom',
   'Devit',
   'vercel-ship-25-coding-agent',
-  'flybot-euro-scanner',
+  'ricknmorty',
   'depabot',
 ] as const
 

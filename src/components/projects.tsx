@@ -58,9 +58,9 @@ export async function Projects () {
 
       {rest.length > 0
         ? (
-          <details className='group'>
+          <details className='group/details'>
             <summary className='flex cursor-pointer items-center gap-2 rounded-md border border-border/30 px-3 py-2 text-xs text-muted-foreground transition-all hover:border-border/60 hover:text-foreground'>
-              <span className='transition-transform group-open:rotate-90'>
+              <span className='transition-transform group-open/details:rotate-90'>
                 &rsaquo;
               </span>
               {rest.length} more projects
