@@ -106,8 +106,6 @@ export default function RootLayout ({
   return (
     <html lang='en' className='dark'>
       <head>
-        <link rel='dns-prefetch' href='https://api.github.com' />
-        <link rel='preconnect' href='https://api.github.com' crossOrigin='anonymous' />
         <script
           type='application/ld+json'
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
