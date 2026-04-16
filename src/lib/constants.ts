@@ -15,9 +15,13 @@ export const SITE_CONFIG = {
 } as const
 
 export const PINNED_REPOS = [
+  'bice-cli',
   'bloom-bar',
   'forever-chile',
+  'mooonto',
+  'log.js',
   'entropy-unit',
+  'alternify',
 ] as const
 
 export const FEATURED_REPOS = [
