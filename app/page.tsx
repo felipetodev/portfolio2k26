@@ -3,6 +3,7 @@ import path from "node:path";
 import { Divider } from "@/components/divider";
 import { Intro } from "@/components/intro";
 import { Projects } from "@/components/projects";
+import { Terminal } from "@/components/terminal";
 
 export default function Portfolio() {
   const agentsContent = fs.readFileSync(
@@ -23,9 +24,7 @@ export default function Portfolio() {
           <Projects markdown={agentsContent} />
           {/* row 6 */}
           <Divider className="6️⃣ row-6" />
-          <div className="7️⃣ row-7 h-100 text-black">
-            {/* upcoming section */}
-          </div>
+          <Terminal />
         </div>
       </div>
     </main>

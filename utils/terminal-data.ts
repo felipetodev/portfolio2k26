@@ -1,0 +1,98 @@
+type Output = string[] | "clear";
+
+export type Command = {
+  description: string;
+  hidden?: boolean; // easter eggs: work, but not listed in help
+  run: (args: string[]) => Output | Promise<Output>;
+};
+
+// Fake files shown by `ls` (and autocompleted by `cat`).
+export const files = [
+  { perms: "drwxr-xr-x", name: "side-projects-never-finished/" },
+  { perms: "drwxr-xr-x", name: "node_modules/", note: "(heavier than a black hole)" },
+  { perms: "-rw-r--r--", name: "elden-ring-deaths.log", note: "(2.4 GB and growing)" },
+  { perms: "-rw-r--r--", name: "TODO.md", note: "(last edited: 2019)" },
+  { perms: "-rw-r--r--", name: "fix-later.ts" },
+  { perms: "-rw-r--r--", name: "final_v2_FINAL_ahora_si.tsx" },
+  { perms: "-r--------", name: "secrets.env", note: "(nice try 👀)" },
+];
+
+export const commands: Record<string, Command> = {
+  help: {
+    description: "list available commands",
+    run: () => [
+      ...Object.entries(commands)
+        .filter(([, c]) => !c.hidden)
+        .map(
+        ([name, c]) => `  ${name.padEnd(10)} ${c.description}`,
+      ),
+      "",
+      "tip: use ↑/↓ for history and tab to autocomplete",
+    ],
+  },
+  whoami: {
+    description: "who am I",
+    run: () => ["felipe ossandon, AI engineer enthusiast"],
+  },
+  projects: {
+    description: "things I've built",
+    run: () => ["  🌐 https://github.com/felipetodev"],
+  },
+  work: {
+    description: "where I work",
+    run: () => ["currently working for Globant @ British Airways"],
+  },
+  fun: {
+    description: "a curiosity",
+    run: () => ["currently an Elden Ring player"],
+  },
+  music: {
+    description: "what I'm listening to on Spotify",
+    run: async () => {
+      try {
+        const res = await fetch("/api/spotify");
+        if (!res.ok) throw new Error();
+        const song = (await res.json()) as {
+          playing: boolean;
+          title: string;
+          artist: string;
+          url: string;
+        };
+        return [
+          song.playing ? "♫ now playing" : "♫ last played",
+          `  ${song.title} — ${song.artist}`,
+          `  ${song.url}`,
+        ];
+      } catch {
+        return ["spotify is taking a break, try again later."];
+      }
+    },
+  },
+  ls: {
+    description: "list my files",
+    hidden: true,
+    run: () =>
+      files.map(({ perms, name, note }) =>
+        `${perms}  ${note ? `${name.padEnd(31)}${note}` : name}`,
+      ),
+  },
+  cat: {
+    description: "read a file",
+    hidden: true,
+    run: ([file]) => {
+      if (!file) return ["cat: missing file. try `ls` 👀"];
+      if (file === "secrets.env") {
+        return [
+          "OPENAI_API_KEY=nice-try-buddy",
+          "BANK_PASSWORD=hunter2",
+          "ELDEN_RING_BOSS_STRATEGY=panic-roll",
+          "REAL_SECRET=i-still-google-how-to-center-a-div",
+          "",
+          "# ⚠️  this incident will be reported to my mom",
+        ];
+      }
+      return ["what are you looking for? 👀"];
+    },
+  },
+  clear: { description: "clear the screen", run: () => "clear" },
+};
