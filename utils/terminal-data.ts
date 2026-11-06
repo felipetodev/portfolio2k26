@@ -49,7 +49,7 @@ export const commands: Record<string, Command> = {
   },
   work: {
     description: "where I work",
-    run: () => ["currently working for Globant @ British Airways"],
+    run: () => ["currently working for Globant @ British Airways ✈️"],
   },
   fun: {
     description: "a curiosity",

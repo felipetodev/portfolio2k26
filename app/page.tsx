@@ -3,6 +3,7 @@ import path from "node:path";
 import { Divider } from "@/components/divider";
 import { Intro } from "@/components/intro";
 import { Projects } from "@/components/projects";
+import { SystemMonitor } from "@/components/system-monitor";
 import { Terminal } from "@/components/terminal";
 
 export default function Portfolio() {
@@ -23,7 +24,7 @@ export default function Portfolio() {
           {/* row 5 */}
           <Projects markdown={agentsContent} />
           {/* row 6 */}
-          <Divider className="6️⃣ row-6" />
+          <SystemMonitor className="6️⃣ row-6" />
           <Terminal />
         </div>
       </div>
