@@ -145,7 +145,7 @@ export function Terminal() {
   return (
     <section
       aria-label="Interactive terminal"
-      className="row-7 p-2 md:p-5 text-black"
+      className="row-7 min-w-0 p-2 md:p-5 text-black"
     >
       <div
         onClick={() => inputRef.current?.focus({ preventScroll: true })}
@@ -157,7 +157,7 @@ export function Terminal() {
         } as React.CSSProperties}
         className="border border-dashed border-(--t-border) bg-(--t-bg) text-xs transition-colors duration-300 motion-reduce:transition-none"
       >
-        <div className="flex items-center gap-2 border-b border-dashed border-(--t-border) px-4 py-2 text-(--t-muted)">
+        <div className="flex items-center gap-2 border-b border-dashed border-(--t-border) px-3 md:px-4 py-2 text-(--t-muted)">
           <span aria-hidden>●</span>
           <span>felipeto@portfolio ~ </span>
         </div>
@@ -165,7 +165,7 @@ export function Terminal() {
           ref={logRef}
           role="log"
           aria-live="polite"
-          className="h-72 overflow-y-auto px-4 py-3 leading-relaxed text-(--t-fg)"
+          className="relative h-72 overflow-auto px-3 md:px-4 py-3 leading-relaxed text-(--t-fg)"
         >
           {WELCOME.map((l) => (
             <p key={l} className="text-(--t-muted)">{l}</p>
@@ -174,7 +174,7 @@ export function Terminal() {
             <div key={i} className="mt-2">
               <p><span aria-hidden className="text-(--t-muted)">❯ </span>{en.cmd}</p>
               {en.out.map((line, j) => (
-                <pre key={j} className="whitespace-pre-wrap font-mono">
+                <pre key={j} className="whitespace-pre font-mono">
                   {line ? linkify(line) : " "}
                 </pre>
               ))}
@@ -182,7 +182,6 @@ export function Terminal() {
           ))}
           <label className="mt-2 flex items-center gap-2">
             <span aria-hidden className="text-(--t-muted)">❯</span>
-            <span className="sr-only">Enter a command</span>
             <input
               ref={inputRef}
               value={value}
@@ -193,7 +192,8 @@ export function Terminal() {
               autoCapitalize="off"
               autoCorrect="off"
               placeholder="type help"
-              className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-(--t-muted) focus-visible:underline"
+              aria-label="Enter a command"
+              className="min-w-0 flex-1 bg-transparent text-base md:text-xs outline-none placeholder:text-(--t-muted) focus-visible:underline"
             />
           </label>
         </div>
