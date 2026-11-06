@@ -1,4 +1,13 @@
-type Output = string[] | "clear";
+type Output = string[] | "clear" | { lines: string[]; theme: ThemeName };
+
+// Terminal color themes (applied as CSS variables on the terminal).
+export const themes = {
+  default: { bg: "#f2f0ef", fg: "#374151", muted: "#6b7280", border: "rgb(107 114 128 / 0.3)" },
+  dracula: { bg: "#282a36", fg: "#f8f8f2", muted: "#bd93f9", border: "#44475a" },
+  matrix: { bg: "#0d0d0d", fg: "#33ff66", muted: "#1a9c3e", border: "#1a3d24" },
+  claude: { bg: "#1f1e1d", fg: "#f5f4ef", muted: "#d97757", border: "#3d3a36" },
+} as const;
+export type ThemeName = keyof typeof themes;
 
 export type Command = {
   description: string;
@@ -14,7 +23,7 @@ export const files = [
   { perms: "-rw-r--r--", name: "TODO.md", note: "(last edited: 2019)" },
   { perms: "-rw-r--r--", name: "fix-later.ts" },
   { perms: "-rw-r--r--", name: "final_v2_FINAL_ahora_si.tsx" },
-  { perms: "-r--------", name: "secrets.env", note: "(nice try 👀)" },
+  { perms: "-r--------", name: "secrets.env", note: "(...👀)" },
 ];
 
 export const commands: Record<string, Command> = {
@@ -92,6 +101,15 @@ export const commands: Record<string, Command> = {
         ];
       }
       return ["what are you looking for? 👀"];
+    },
+  },
+  themes: {
+    description: "change the terminal colors",
+    run: ([name]) => {
+      const list = Object.keys(themes).map((t) => `  ${t}`);
+      if (!name) return ["available themes:", ...list, "", "usage: themes <name>"];
+      if (!(name in themes)) return [`unknown theme: ${name}`, ...list];
+      return { lines: [`theme set to ${name} ✨`], theme: name as ThemeName };
     },
   },
   clear: { description: "clear the screen", run: () => "clear" },

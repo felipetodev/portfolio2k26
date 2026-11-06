@@ -1,6 +1,39 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { commands, files } from "@/utils/terminal-data";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  commands,
+  files,
+  themes,
+  type ThemeName,
+} from "@/utils/terminal-data";
+
+const THEME_KEY = "terminal-theme";
+
+// Saved theme lives in localStorage; useSyncExternalStore keeps SSR safe.
+const listeners = new Set<() => void>();
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  return () => listeners.delete(cb);
+}
+function readTheme(): ThemeName {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved && saved in themes) return saved as ThemeName;
+  } catch {}
+  return "default";
+}
+function applyTheme(name: ThemeName) {
+  try {
+    localStorage.setItem(THEME_KEY, name);
+  } catch {}
+  listeners.forEach((cb) => cb());
+}
+
+// Argument autocompletion: command → possible values.
+const ARGS: Record<string, string[]> = {
+  cat: files.map((f) => f.name),
+  themes: Object.keys(themes),
+};
 
 type Entry = { id?: number; cmd: string; out: string[] };
 
@@ -12,7 +45,7 @@ function linkify(line: string) {
         href={part}
         target="_blank"
         rel="noopener noreferrer"
-        className="underline underline-offset-2 hover:text-black"
+        className="underline underline-offset-2 hover:opacity-70"
       >
         {part}
       </a>
@@ -31,6 +64,7 @@ export function Terminal() {
   const [cursor, setCursor] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
+  const theme = useSyncExternalStore<ThemeName>(subscribe, readTheme, () => "default");
 
   // scroll inside the log only (never the page)
   useEffect(() => {
@@ -56,11 +90,19 @@ export function Terminal() {
     if (Array.isArray(result)) {
       return setEntries((e) => [...e, { cmd: raw, out: result }]);
     }
+    if (!(result instanceof Promise)) {
+      applyTheme(result.theme);
+      return setEntries((e) => [...e, { cmd: raw, out: result.lines }]);
+    }
     const id = Date.now();
     setEntries((e) => [...e, { id, cmd: raw, out: ["loading..."] }]);
     const out = await result;
     setEntries((e) =>
-      out === "clear" ? [] : e.map((en) => (en.id === id ? { ...en, out } : en)),
+      Array.isArray(out)
+        ? e.map((en) => (en.id === id ? { ...en, out } : en))
+        : out === "clear"
+          ? []
+          : e,
     );
   }
 
@@ -83,11 +125,11 @@ export function Terminal() {
         setCursor(i);
         setValue(history[i]);
       }
-    } else if (e.key === "Tab" && value.startsWith("cat ")) {
+    } else if (e.key === "Tab" && value.includes(" ")) {
       e.preventDefault();
-      const partial = value.slice(4).trimStart();
-      const match = files.find((f) => f.name.startsWith(partial));
-      if (match) setValue(`cat ${match.name}`);
+      const [cmd, partial = ""] = value.split(/\s+/);
+      const match = ARGS[cmd]?.find((a) => a.startsWith(partial));
+      if (match) setValue(`${cmd} ${match}`);
     } else if (e.key === "Tab" && value) {
       e.preventDefault();
       const match = Object.entries(commands).find(
@@ -107,24 +149,30 @@ export function Terminal() {
     >
       <div
         onClick={() => inputRef.current?.focus({ preventScroll: true })}
-        className="border border-dashed border-gray-500/30 bg-[#f2f0ef] text-xs"
+        style={{
+          "--t-bg": themes[theme].bg,
+          "--t-fg": themes[theme].fg,
+          "--t-muted": themes[theme].muted,
+          "--t-border": themes[theme].border,
+        } as React.CSSProperties}
+        className="border border-dashed border-(--t-border) bg-(--t-bg) text-xs transition-colors duration-300 motion-reduce:transition-none"
       >
-        <div className="flex items-center gap-2 border-b border-dashed border-gray-500/30 px-4 py-2 text-gray-500">
+        <div className="flex items-center gap-2 border-b border-dashed border-(--t-border) px-4 py-2 text-(--t-muted)">
           <span aria-hidden>●</span>
-          <span>felipe@portfolio ~ </span>
+          <span>felipeto@portfolio ~ </span>
         </div>
         <div
           ref={logRef}
           role="log"
           aria-live="polite"
-          className="h-72 overflow-y-auto px-4 py-3 leading-relaxed text-gray-700"
+          className="h-72 overflow-y-auto px-4 py-3 leading-relaxed text-(--t-fg)"
         >
           {WELCOME.map((l) => (
-            <p key={l} className="text-gray-500">{l}</p>
+            <p key={l} className="text-(--t-muted)">{l}</p>
           ))}
           {entries.map((en, i) => (
             <div key={i} className="mt-2">
-              <p><span aria-hidden className="text-gray-500">❯ </span>{en.cmd}</p>
+              <p><span aria-hidden className="text-(--t-muted)">❯ </span>{en.cmd}</p>
               {en.out.map((line, j) => (
                 <pre key={j} className="whitespace-pre-wrap font-mono">
                   {line ? linkify(line) : " "}
@@ -133,7 +181,7 @@ export function Terminal() {
             </div>
           ))}
           <label className="mt-2 flex items-center gap-2">
-            <span aria-hidden className="text-gray-500">❯</span>
+            <span aria-hidden className="text-(--t-muted)">❯</span>
             <span className="sr-only">Enter a command</span>
             <input
               ref={inputRef}
@@ -145,7 +193,7 @@ export function Terminal() {
               autoCapitalize="off"
               autoCorrect="off"
               placeholder="type help"
-              className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-gray-400 focus-visible:underline"
+              className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-(--t-muted) focus-visible:underline"
             />
           </label>
         </div>
