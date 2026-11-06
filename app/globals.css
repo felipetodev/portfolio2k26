@@ -10,7 +10,54 @@
   );
 }
 
+/*
+ * Site color schemes (switched with `system theme <name>` in the terminal).
+ * The UI uses Tailwind's black/gray scale + --page/--surface, so each theme
+ * only remaps those tokens and everything stays consistent.
+ */
+:root {
+  --page: #e7e5e4;
+  --surface: #f2f0ef;
+}
+
+[data-theme="midnight"] {
+  color-scheme: dark;
+  --page: #0d1117;
+  --surface: #161b22;
+  --color-black: #e6edf3;
+  --color-gray-400: #6e7681;
+  --color-gray-500: #8b949e;
+  --color-gray-600: #a3acb7;
+  --color-gray-700: #c9d1d9;
+  --color-gray-800: #dde3ea;
+}
+
+[data-theme="matcha"] {
+  --page: #dfe6d3;
+  --surface: #edf1e5;
+  --color-black: #1e2a1a;
+  --color-gray-400: #8c9a83;
+  --color-gray-500: #6b7a62;
+  --color-gray-600: #56644e;
+  --color-gray-700: #3f4b39;
+  --color-gray-800: #2c3628;
+}
+
+[data-theme="sunset"] {
+  color-scheme: dark;
+  --page: #1d1220;
+  --surface: #2a1a2e;
+  --color-black: #ffe4d6;
+  --color-gray-400: #8a6b80;
+  --color-gray-500: #b0849a;
+  --color-gray-600: #d29aa8;
+  --color-gray-700: #f2b8a8;
+  --color-gray-800: #ffd3c0;
+}
+
 @theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
@@ -24,8 +71,12 @@
   }
 }
 
+html {
+  transition: background-color 0.3s;
+}
+
 body {
-  background: var(--background);
+  background: var(--page);
   color: var(--foreground);
   font-family: var(--font-mono);
 }
@@ -35,3 +86,4 @@ body {
     scroll-behavior: smooth;
   }
 }
+

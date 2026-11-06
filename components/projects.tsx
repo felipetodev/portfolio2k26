@@ -93,7 +93,7 @@ function ProjectWorkTree({ markdown }: { markdown: string }) {
         <div className="sticky flex justify-center bottom-4">
           <button
             onClick={() => setView("workTree")}
-            className="cursor-pointer px-2.5 text-black bg-[#f2f0ef] border border-black/40 hover:bg-[#e7e5e4] transition-colors shadow-sm"
+            className="cursor-pointer px-2.5 text-black bg-surface border border-black/40 hover:bg-page transition-colors shadow-sm"
           >
             Back [esc]
           </button>
@@ -112,7 +112,7 @@ function ProjectWorkTree({ markdown }: { markdown: string }) {
           {activeTab === "agents" ? (
             <motion.div
               layoutId="tab-indicator"
-              className="absolute inset-0 bg-[#E7E5E4]"
+              className="absolute inset-0 bg-page"
             />
           ) : null}
           <FileIcon className="z-10 relative size-4 text-gray-500" />
@@ -129,7 +129,7 @@ function ProjectWorkTree({ markdown }: { markdown: string }) {
           {activeTab === "claude" ? (
             <motion.div
               layoutId="tab-indicator"
-              className="absolute inset-0 bg-[#E7E5E4]"
+              className="absolute inset-0 bg-page"
             />
           ) : null}
           <FileInputIcon className="z-10 relative size-4 text-gray-500" />
@@ -149,7 +149,7 @@ function ProjectWorkTree({ markdown }: { markdown: string }) {
           {activeTab === "folder" ? (
             <motion.div
               layoutId="tab-indicator"
-              className="absolute inset-0 bg-[#E7E5E4]"
+              className="absolute inset-0 bg-page"
             />
           ) : null}
           <ChevronIcon className="z-10 relative size-4 text-gray-500 rotate-90" />
@@ -187,7 +187,7 @@ function ProjectWorkTree({ markdown }: { markdown: string }) {
                     {activeTab === id ? (
                       <motion.div
                         layoutId="tab-indicator"
-                        className="absolute inset-0 bg-[#E7E5E4]"
+                        className="absolute inset-0 bg-page"
                       >
                         <div className="flex size-full items-center justify-end px-4">
                           <a
@@ -220,7 +220,7 @@ function ProjectWorkTree({ markdown }: { markdown: string }) {
         Explore featured works and experiments
       </h3>
       <div
-        className={`relative bg-[#f2f0ef] border border-black/40 overflow-hidden ${view === "markdown" ? "max-h-83.5" : "p-4"}`}
+        className={`relative bg-surface border border-black/40 overflow-hidden ${view === "markdown" ? "max-h-83.5" : "p-4"}`}
       >
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div

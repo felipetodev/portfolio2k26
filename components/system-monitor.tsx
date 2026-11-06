@@ -217,7 +217,7 @@ export function SystemMonitor({ className = "" }: { className?: string }) {
         before:absolute before:w-[200vw] before:border-b before:border-gray-500/20 before:left-1/2 before:-translate-x-1/2 before:-bottom-px
         after:absolute after:w-[200vw] after:border-t after:border-gray-500/20 after:left-1/2 after:-translate-x-1/2 after:-top-px`}
     >
-      <div className="border border-dashed border-gray-500/30 bg-[#f2f0ef] p-3 md:p-4">
+      <div className="border border-dashed border-gray-500/30 bg-surface p-3 md:p-4">
         <div className="mb-3 flex items-center justify-between text-xs font-bold tracking-[0.3em] text-gray-700">
           <h2>SYSTEM MONITOR</h2>
           <span
@@ -236,7 +236,7 @@ export function SystemMonitor({ className = "" }: { className?: string }) {
 
         {/* LED panel: a dim dot grid behind lit dot-matrix text */}
         <div
-          className={`${doto.className} relative overflow-hidden rounded-md border border-black/40 bg-black py-2
+          className={`${doto.className} relative overflow-hidden rounded-md border border-black/40 bg-[#000] py-2
             bg-[radial-gradient(circle,rgb(255_255_255/0.09)_1.2px,transparent_1.4px)] bg-size-[5px_5px]`}
           style={critical ? { borderColor: RED, boxShadow: `0 0 12px ${RED}66` } : undefined}
         >

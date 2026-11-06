@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@fontsource/ibm-plex-mono/400.css";
 import "./globals.css";
+import { siteThemeScript } from "@/utils/site-theme";
 
 export const metadata: Metadata = {
   title: "About | Felipe Ossandon",
@@ -15,8 +16,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full antialiased bg-[#E7E5E4] font-mono"
+      className="h-full antialiased bg-page font-mono"
+      suppressHydrationWarning // data-theme is set before hydration
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: siteThemeScript }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

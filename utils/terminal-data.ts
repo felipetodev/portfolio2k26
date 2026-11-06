@@ -1,10 +1,17 @@
 import { triggerSystemAlert } from "./system-events";
+import { setSiteTheme, siteThemes, type SiteTheme } from "./site-theme";
 
 type Output = string[] | "clear" | { lines: string[]; theme: ThemeName };
 
 // Terminal color themes (applied as CSS variables on the terminal).
 export const themes = {
-  default: { bg: "#f2f0ef", fg: "#374151", muted: "#6b7280", border: "rgb(107 114 128 / 0.3)" },
+  // follows the site color scheme (see `system theme`)
+  default: {
+    bg: "var(--surface)",
+    fg: "var(--color-gray-700)",
+    muted: "var(--color-gray-500)",
+    border: "color-mix(in oklab, var(--color-gray-500) 30%, transparent)",
+  },
   dracula: { bg: "#282a36", fg: "#f8f8f2", muted: "#bd93f9", border: "#44475a" },
   matrix: { bg: "#0d0d0d", fg: "#33ff66", muted: "#1a9c3e", border: "#1a3d24" },
   claude: { bg: "#1f1e1d", fg: "#f5f4ef", muted: "#d97757", border: "#3d3a36" },
@@ -35,7 +42,7 @@ export const commands: Record<string, Command> = {
       ...Object.entries(commands)
         .filter(([, c]) => !c.hidden)
         .map(
-        ([name, c]) => `  ${name.padEnd(10)} ${c.description}`,
+        ([name, c]) => `  ${name.padEnd(14)} ${c.description}`,
       ),
       "",
       "tip: use ↑/↓ for history and tab to autocomplete",
@@ -112,6 +119,16 @@ export const commands: Record<string, Command> = {
       if (!name) return ["available themes:", ...list, "", "usage: themes <name>"];
       if (!(name in themes)) return [`unknown theme: ${name}`, ...list];
       return { lines: [`theme set to ${name} ✨`], theme: name as ThemeName };
+    },
+  },
+  "system-theme": {
+    description: "change the whole site colors",
+    run: ([name]) => {
+      const list = siteThemes.map((t) => `  ${t}`);
+      if (!name) return ["available system themes:", ...list, "", "usage: system-theme <name>"];
+      if (!siteThemes.includes(name as SiteTheme)) return [`unknown system theme: ${name}`, ...list];
+      setSiteTheme(name as SiteTheme);
+      return [`system theme set to ${name} 🎨`];
     },
   },
   sudo: {

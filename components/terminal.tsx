@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { siteThemes } from "@/utils/site-theme";
 import {
   commands,
   files,
@@ -33,6 +34,7 @@ function applyTheme(name: ThemeName) {
 const ARGS: Record<string, string[]> = {
   cat: files.map((f) => f.name),
   themes: Object.keys(themes),
+  "system-theme": [...siteThemes],
 };
 
 type Entry = { id?: number; cmd: string; out: string[] };
@@ -127,9 +129,12 @@ export function Terminal() {
       }
     } else if (e.key === "Tab" && value.includes(" ")) {
       e.preventDefault();
-      const [cmd, partial = ""] = value.split(/\s+/);
-      const match = ARGS[cmd]?.find((a) => a.startsWith(partial));
-      if (match) setValue(`${cmd} ${match}`);
+      // complete the last word using everything before it as the key
+      const words = value.split(/\s+/);
+      const partial = words.pop() ?? "";
+      const prefix = words.join(" ");
+      const match = ARGS[prefix]?.find((a) => a.startsWith(partial));
+      if (match) setValue(`${prefix} ${match}`);
     } else if (e.key === "Tab" && value) {
       e.preventDefault();
       const match = Object.entries(commands).find(
