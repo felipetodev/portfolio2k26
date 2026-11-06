@@ -4,6 +4,7 @@ import { Divider } from "@/components/divider";
 import { Intro } from "@/components/intro";
 import { Projects } from "@/components/projects";
 import { SystemMonitor } from "@/components/system-monitor";
+import { ReachMe } from "@/components/reach-me";
 import { Terminal } from "@/components/terminal";
 
 export default function Portfolio() {
@@ -26,6 +27,8 @@ export default function Portfolio() {
           {/* row 6 */}
           <SystemMonitor className="6️⃣ row-6" />
           <Terminal />
+          {/* row 8 */}
+          <ReachMe />
         </div>
       </div>
     </main>

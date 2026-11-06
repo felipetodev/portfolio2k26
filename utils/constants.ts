@@ -37,3 +37,11 @@ export const projects = [
     url: "https://github.com/felipetodev/entropy-unit",
   },
 ] as const;
+
+export const contact = {
+  github: "https://github.com/felipetodev",
+  x: "https://x.com/fe_ossandon",
+  xHandle: "@fe_ossandon",
+  linkedin: "https://www.linkedin.com/in/felipeossandon/",
+  email: "contactme@felipetodev.com",
+} as const;

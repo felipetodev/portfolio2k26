@@ -241,7 +241,7 @@ function ProjectWorkTree({ markdown }: { markdown: string }) {
 
 export function Projects({ markdown }: { markdown: string }) {
   return (
-    <section className="5️⃣ row-5 space-y-8 p-2 md:p-5">
+    <section id="work" className="5️⃣ row-5 space-y-8 p-2 md:p-5">
       <h2 className="uppercase font-bold text-black/70 tracking-wider">
         01 / Projects
       </h2>

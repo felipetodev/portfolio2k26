@@ -144,9 +144,16 @@ export function Terminal() {
 
   return (
     <section
-      aria-label="Interactive terminal"
-      className="row-7 min-w-0 p-2 md:p-5 text-black"
+      id="about"
+      aria-labelledby="about-heading"
+      className="row-7 min-w-0 space-y-8 p-2 md:p-5 text-black"
     >
+      <h2
+        id="about-heading"
+        className="uppercase font-bold text-black/70 tracking-wider"
+      >
+        02 / About me
+      </h2>
       <div
         onClick={() => inputRef.current?.focus({ preventScroll: true })}
         style={{
@@ -159,7 +166,7 @@ export function Terminal() {
       >
         <div className="flex items-center gap-2 border-b border-dashed border-(--t-border) px-3 md:px-4 py-2 text-(--t-muted)">
           <span aria-hidden>●</span>
-          <span>felipeto@portfolio ~ </span>
+          <span>felipeto@portfolio ~ %</span>
         </div>
         <div
           ref={logRef}

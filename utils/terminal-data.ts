@@ -1,3 +1,5 @@
+import { triggerSystemAlert } from "./system-events";
+
 type Output = string[] | "clear" | { lines: string[]; theme: ThemeName };
 
 // Terminal color themes (applied as CSS variables on the terminal).
@@ -110,6 +112,24 @@ export const commands: Record<string, Command> = {
       if (!name) return ["available themes:", ...list, "", "usage: themes <name>"];
       if (!(name in themes)) return [`unknown theme: ${name}`, ...list];
       return { lines: [`theme set to ${name} ✨`], theme: name as ThemeName };
+    },
+  },
+  sudo: {
+    description: "run as root",
+    hidden: true,
+    run: (args) => {
+      if (args.join(" ").startsWith("rm -rf")) {
+        triggerSystemAlert();
+        return [
+          "[sudo] password for felipeto: ********",
+          "removing /usr ... done",
+          "removing /home/felipeto/side-projects ... done",
+          "removing /portfolio ... ",
+          "",
+          "⚠️  CRITICAL: check the system monitor ↑",
+        ];
+      }
+      return ["felipeto is not in the sudoers file. This incident will be reported."];
     },
   },
   clear: { description: "clear the screen", run: () => "clear" },

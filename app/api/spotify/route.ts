@@ -1,7 +1,3 @@
-// Returns the song currently playing on Spotify, or the last one played.
-// Needs SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET and SPOTIFY_REFRESH_TOKEN
-// (scopes: user-read-currently-playing, user-read-recently-played).
-
 type Track = {
   name: string;
   artists: { name: string }[];
