@@ -5,6 +5,7 @@ import { Intro } from "@/components/intro";
 import { Projects } from "@/components/projects";
 import { SystemMonitor } from "@/components/system-monitor";
 import { ReachMe } from "@/components/reach-me";
+import { Footer } from "@/components/footer";
 import { Terminal } from "@/components/terminal";
 
 export default function Portfolio() {
@@ -15,7 +16,7 @@ export default function Portfolio() {
   return (
     <main className="flex flex-col flex-1 items-center justify-center bg-page px-3 md:px-6 overflow-hidden">
       <div className="grid grid-cols-[var(--fluid-col)_minmax(0,1fr)_var(--fluid-col)] grid-rows-[repeat(6,auto)_1fr_repeat(4,auto)] max-w-4xl w-full min-h-screen mx-auto border-x border-dashed border-black/30">
-        <div className="grid grid-rows-subgrid col-2 row-[1/11] border-x border-gray-500/20">
+        <div className="grid grid-rows-subgrid col-2 row-[1/12] border-x border-gray-500/20">
           {/* row 1 */}
           <section className="1️⃣ relative h-10 row-1 before:content before:absolute before:h-px before:w-[200vw] before:border-b before:border-black/30 before:border-dashed before:left-1/2 before:-translate-x-1/2 before:-bottom-px" />
           {/* row 2 */}
@@ -29,6 +30,12 @@ export default function Portfolio() {
           <Terminal />
           {/* row 8 */}
           <ReachMe />
+          {/* row 9 */}
+          <Divider className="row-9" />
+          {/* row 10 */}
+          <Footer className="row-10" />
+          {/* row 11 */}
+          <section className="1️⃣1️⃣ relative h-10 row-11 before:content before:absolute before:h-px before:w-[200vw] before:border-t before:border-black/30 before:border-dashed before:left-1/2 before:-translate-x-1/2 before:-top-px" />
         </div>
       </div>
     </main>
