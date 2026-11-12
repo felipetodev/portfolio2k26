@@ -2,12 +2,19 @@
 import { useEffect, useRef } from "react";
 
 const RAMP = " .+*#%@";
-const TICK_MS = 80;
-const SPARKLE_RATE = 0.02; // share of glyphs twinkling per tick
-const SPARKLE_LIFE = 4; // ticks before a glyph snaps back to its base char
+const FRAME_MS = 33; // ~30fps is plenty for text
+const PERIOD_MS = 4200; // sweep + rest
+const SWEEP_MS = 1500;
+const START_DELAY_MS = 400;
+const BAND = 7; // band half-width, in columns
+const SKEW = 0.9; // diagonal lean: how many cols a row shifts the band
+const LIFT = 4; // max levels a glyph is bleached at the band's centre
 
-// Renders the ASCII statically (SSR) and, on the client, makes random glyphs
-// twinkle to a nearby density char, then restore. The shape never changes.
+const easeInOut = (t: number) => 0.5 - Math.cos(Math.PI * t) / 2;
+
+// Renders the ASCII statically (SSR) and, on the client, sweeps a diagonal
+// glint across it: glyphs thin to lighter chars as the band passes, then rest
+// until the next pass. The shape never changes.
 export function AsciiShine({ text, className }: { text: string; className?: string }) {
   const ref = useRef<HTMLPreElement>(null);
 
@@ -17,37 +24,63 @@ export function AsciiShine({ text, className }: { text: string; className?: stri
 
     const base = [...text];
     const chars = [...base];
-    const lit = base.flatMap((c, i) => (RAMP.indexOf(c) > 1 ? [i] : [])); // skip spaces and dots
-    const live = new Map<number, number>(); // index -> remaining ticks
-    let timer: ReturnType<typeof setInterval> | undefined;
-
-    const tick = () => {
-      for (const [i, left] of live) {
-        if (left <= 1) {
-          chars[i] = base[i];
-          live.delete(i);
-        } else live.set(i, left - 1);
+    const glyphs: { i: number; col: number; row: number; level: number }[] = [];
+    let col = 0;
+    let row = 0;
+    let cols = 0;
+    base.forEach((c, i) => {
+      if (c === "\n") {
+        cols = Math.max(cols, col);
+        col = 0;
+        row++;
+        return;
       }
-      const n = Math.ceil(lit.length * SPARKLE_RATE);
-      for (let k = 0; k < n; k++) {
-        const i = lit[(Math.random() * lit.length) | 0];
-        const level = RAMP.indexOf(base[i]);
-        const next = Math.min(RAMP.length - 1, Math.max(2, level + ((Math.random() * 5) | 0) - 2));
-        chars[i] = RAMP[next];
-        live.set(i, 1 + ((Math.random() * SPARKLE_LIFE) | 0));
+      const level = RAMP.indexOf(c);
+      if (level > 1) glyphs.push({ i, col, row, level }); // skip spaces and dots
+      col++;
+    });
+    cols = Math.max(cols, col);
+    const span = cols + (row + 1) * SKEW + BAND * 4;
+
+    let t0 = 0;
+    let last = 0;
+    let dirty = false;
+    let raf = 0;
+
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      if (now - last < FRAME_MS) return;
+      last = now;
+      if (!t0) t0 = now + START_DELAY_MS;
+
+      const t = (now - t0) % PERIOD_MS;
+      if (now < t0 || t > SWEEP_MS) {
+        // resting: restore once, then do no work
+        if (!dirty) return;
+        for (const g of glyphs) chars[g.i] = base[g.i];
+        dirty = false;
+      } else {
+        const centre = -BAND * 2 + easeInOut(t / SWEEP_MS) * span;
+        for (const g of glyphs) {
+          const d = g.col + g.row * SKEW - centre;
+          const w = d > 0 ? BAND * 0.45 : BAND; // sharp leading edge, soft tail
+          const lift = Math.round(Math.exp(-((d / w) ** 2)) * LIFT);
+          chars[g.i] = RAMP[Math.max(1, g.level - lift)];
+        }
+        dirty = true;
       }
       el.textContent = chars.join("");
     };
 
     // animate only while on screen
     const io = new IntersectionObserver(([entry]) => {
-      clearInterval(timer);
-      if (entry.isIntersecting) timer = setInterval(tick, TICK_MS);
+      cancelAnimationFrame(raf);
+      if (entry.isIntersecting) raf = requestAnimationFrame(loop);
     });
     io.observe(el);
     return () => {
       io.disconnect();
-      clearInterval(timer);
+      cancelAnimationFrame(raf);
     };
   }, [text]);
 
