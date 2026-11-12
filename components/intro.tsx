@@ -8,9 +8,12 @@ export function Intro() {
         <p className="tracking-wide">a fullstack web developer</p>
         <span className="text-sm text-gray-500">based in santiago, chile</span>
       </div>
-      <p className="text-gray-700 text-sm">
-        Im a software engineer with a passion for building innovative solutions
-        and contributing to open source projects
+      <p className="text-gray-700 text-sm text-balance whitespace-pre-line">
+        {`I'm a software engineer who has always been drawn to the visual side of
+        products: design systems, UI polish, and making things feel good to use,
+        for users/devs experience.\n\nLately I'm deep into AI-powered apps, building
+        agents and workflows, and observability (evals, metrics, traces), so they
+        actually solve real-world tasks.`}
       </p>
     </section>
   );

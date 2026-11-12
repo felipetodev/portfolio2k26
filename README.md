@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# felipetodev / portfolio2k26
 
-## Getting Started
+## What's inside
 
-First, run the development server:
+- 🖥️ **A real-ish terminal.** Type `help`. Then try things that aren't in `help`. 👀
+- 🎨 **Two theme systems**, because one was too reasonable. Try `themes` and `system-theme`.
+- ✨ **My name in ASCII**, with a glint that sweeps across it.
+- 📡 **System monitor** with blinking LEDs, boot time, Santiago clock and whatever I'm listening to on Spotify.
+- 🎬 **A CLI demo video** that only plays when you're looking at it (I'm not made of bandwidth).
+
+## Stack
+
+`Next.js 16` · `React 19` · `Tailwind v4` · `motion` · `TypeScript` · mass quantities of tokens
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Spotify widget (optional)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Add to `.env.local`, or the widget just shrugs and hides:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
+SPOTIFY_REFRESH_TOKEN=
+```
 
-## Learn More
+## Known issues
 
-To learn more about Next.js, take a look at the following resources:
+- `node_modules/` is heavier than a black hole.
+- `TODO.md` last edited: 2019.
+- `final_v2_FINAL_no_effects.tsx` is not in this repo. Yet.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+   ___________
+  < gg, no re >
+   -----------
+          \   ^__^
+           \  (oo)\_______
+              (__)\       )\/\
+                  ||----w |
+                  ||     ||
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+XOXO 🇨🇱
