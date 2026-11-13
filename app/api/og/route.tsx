@@ -13,13 +13,10 @@ const OUTER = "rgba(0,0,0,0.3)";
 const INNER = "rgba(107,114,128,0.28)";
 const MUTED = "#78716c";
 
-const font = (weight: number) =>
-  readFile(
-    path.join(
-      process.cwd(),
-      `node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-${weight}-normal.woff`,
-    ),
-  );
+// Fonts live next to the route; next.config.ts (outputFileTracingIncludes)
+// makes sure they ship with the serverless function.
+const font = (file: string) =>
+  readFile(path.join(process.cwd(), "app/api/og/fonts", file));
 
 function HLine({ y, color, solid }: { y: number; color: string; solid?: boolean }) {
   return (
@@ -67,7 +64,7 @@ function Cross({ x, y }: { x: number; y: number }) {
 }
 
 export async function GET() {
-  const [regular, medium] = await Promise.all([font(400), font(500)]);
+  const [regular, medium] = await Promise.all([font("plex-400.woff"), font("plex-500.woff")]);
 
   return new ImageResponse(
     (

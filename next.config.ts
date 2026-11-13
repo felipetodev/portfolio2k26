@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  outputFileTracingIncludes: {
+    "/api/og": ["./app/api/og/fonts/**/*"],
+  },
 };
 
 export default nextConfig;

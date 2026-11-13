@@ -3,7 +3,7 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "./globals.css";
 import { siteThemeScript } from "@/utils/site-theme";
 
-const SITE_URL = "https://www.felipetodev.com";
+const SITE_URL = "https://felipetodev.com";
 const TITLE = "Felipe Ossandon | Software Engineer";
 const DESCRIPTION =
   "Felipe Ossandon - Software Engineer, Open Source Contributor, and Tech Enthusiast.";
